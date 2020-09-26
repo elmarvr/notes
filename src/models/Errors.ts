@@ -1,3 +1,10 @@
-export interface Errors {
-  [prop: string]: string | false;
+export interface TypeError {
+  required?: string;
+  validate?: string;
+  pattern?: string;
+  match?: string;
+}
+
+export interface FieldError {
+  [field: string]: Error;
 }

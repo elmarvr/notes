@@ -3,7 +3,7 @@ import { FirebaseError } from "firebase/app";
 
 import { useForm, useAuth } from "../hooks";
 
-import { Card, Form, Button } from "semantic-ui-react";
+import { Card, Form, Button, Input } from "semantic-ui-react";
 import { Anchor, Center, FormInput } from "./styled";
 
 import { SignInElements } from "../models";
@@ -11,38 +11,13 @@ import { SignInElements } from "../models";
 import * as ROUTES from "../constants/routes";
 
 const SignIn = () => {
-  const { register, errors, handleSubmit, setError } = useForm();
+  const { register, errors, handleSubmit } = useForm();
   const auth = useAuth();
 
-  const signIn = async (e: FormEvent<HTMLFormElement>) => {
+  const signIn = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formEL = e.target as HTMLFormElement;
-    const { email, password } = formEL.elements as SignInElements;
-
-    try {
-      const user = await auth.signIn(email.value, password.value);
-    } catch (ex) {
-      const error = ex as FirebaseError;
-
-      switch (error.code) {
-        case "auth/user-not-found":
-          {
-            setError("email", "username not found");
-          }
-          break;
-        case "auth/wrong-password":
-          {
-            setError("password", "password incorrect");
-          }
-          break;
-        case "auth/too-many-requests":
-          {
-            setError("email", "request limit reached");
-          }
-          break;
-      }
-    }
+    console.log("test");
   };
 
   return (
@@ -51,28 +26,11 @@ const SignIn = () => {
         <Card.Content header="Sign in" textAlign="center" />
         <Card.Content>
           <Form onSubmit={handleSubmit(signIn)}>
-            <FormInput
-              name="email"
-              label="Email:"
-              type="text"
-              ref={register({
-                required: true,
-                pattern: /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/,
-                error: {
-                  required: "this is required",
-                  pattern: "invalid email address",
-                },
-              })}
-              errors={errors}
-            />
+            <Form.Field>
+              <label>Email:</label>
+              <Input />
+            </Form.Field>
 
-            <FormInput
-              name="password"
-              label="Password:"
-              type="password"
-              ref={register({ required: true, error: "this is required" })}
-              errors={errors}
-            />
             <Button size="large" primary fluid type="submit">
               Login
             </Button>

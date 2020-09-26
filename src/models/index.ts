@@ -1,4 +1,13 @@
-import { Errors } from "./Errors";
+import { TypeError, FieldError } from "./Errors";
 import { SignUpElements, SignInElements } from "./FormElements";
+import { Rule, Rules, Field } from "./Field";
 
-export { Errors, SignUpElements, SignInElements };
+export {
+  TypeError,
+  Rule,
+  FieldError,
+  Rules,
+  Field,
+  SignUpElements,
+  SignInElements,
+};

@@ -24,6 +24,7 @@ const HeaderContainer = styled(Card.Content)`
   div:not(:last-child) {
     opacity: 0;
     cursor: initial;
+    user-select: none;
   }
   div:last-child {
     position: absolute;
