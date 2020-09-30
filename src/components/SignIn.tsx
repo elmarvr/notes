@@ -1,49 +1,75 @@
-import React, { FormEvent } from "react";
-import { FirebaseError } from "firebase/app";
+import { FirebaseError } from 'firebase';
+import React, { FormEvent, useContext, useEffect } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { Message, Segment } from 'semantic-ui-react';
 
-import { useForm, useAuth } from "../hooks";
-
-import { Card, Form, Button, Input } from "semantic-ui-react";
-import { Anchor, Center, FormInput } from "./styled";
-
-import { SignInElements } from "../models";
-
-import * as ROUTES from "../constants/routes";
+import AuthContext from '../context/AuthContext';
+import { useForm } from '../hooks';
+import { AuthError, AuthRoute, SignInElements } from '../models';
+import { getFormElements } from '../utils/getFormElements';
+import { Field, Widget } from './func';
 
 const SignIn = () => {
-  const { register, errors, handleSubmit } = useForm();
-  const auth = useAuth();
+  const { register, errors, handleSubmit, setError } = useForm();
+  const { auth, signIn } = useContext(AuthContext);
+  const history = useHistory();
 
-  const signIn = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    console.log("test");
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const { username, password } = getFormElements<SignInElements>(event);
+    try {
+      await signIn(username.value, password.value);
+    } catch (error) {
+      console.log(error);
+      setError("authorization", (error as FirebaseError).code);
+    }
   };
 
-  return (
-    <Center>
-      <Card fluid>
-        <Card.Content header="Sign in" textAlign="center" />
-        <Card.Content>
-          <Form onSubmit={handleSubmit(signIn)}>
-            <Form.Field>
-              <label>Email:</label>
-              <Input />
-            </Form.Field>
+  const tooManyRequests = errors.authorization === AuthError.TOO_MANY_REQUESTS;
 
-            <Button size="large" primary fluid type="submit">
-              Login
-            </Button>
-          </Form>
-        </Card.Content>
-        <Card.Content extra textAlign="center">
-          <Anchor to={ROUTES.PASSWORD_RESET}>Forgot Password?</Anchor>
-        </Card.Content>
-      </Card>
-      <p>
-        Don't have a account? <Anchor to={ROUTES.SIGN_UP}>Sign Up</Anchor>
-      </p>
-    </Center>
+  return (
+    <>
+      <Widget loading={auth.loading} onSubmit={handleSubmit(onSubmit)}>
+        <Field
+          ref={register({
+            required: "field is required",
+            pattern: {
+              value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+              message: "email address is invalid",
+            },
+          })}
+          name="username"
+          label="Email:"
+          icon="mail"
+          errors={[
+            errors.username,
+            errors.authorization === AuthError.USER_NOT_FOUND &&
+              "user not found",
+          ]}
+        />
+
+        <Field
+          type="password"
+          ref={register({
+            required: "field is required",
+          })}
+          name="password"
+          label="Password:"
+          icon="lock"
+          errors={[
+            errors.password,
+            errors.authorization === AuthError.WRONG_PASSWORD &&
+              "password is incorrect",
+          ]}
+        />
+      </Widget>
+      <Segment>
+        <Link to={AuthRoute.PASSWORD_RESET}>Reset Password?</Link>
+      </Segment>
+      {tooManyRequests && (
+        <Message error>too many login attemps, try again later...</Message>
+      )}
+    </>
   );
 };
 

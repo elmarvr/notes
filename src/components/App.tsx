@@ -1,30 +1,57 @@
-import React from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import React, { useContext, useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-import Navigation from "./Navigation";
-import SignInPage from "./SignIn";
-import SignUpPage from "./SignUp";
-import PasswordResetPage from "./PasswordReset";
-import PasswordUpdatePage from "./PasswordUpdate";
-// import HomePage from "./Home";
-// import AccountPage from "./Account";
-// import AdminPage from "./Admin";
+import AuthContext from '../context/AuthContext';
+import { AuthRoute } from '../models/AuthRoute';
+import Container from './func/Container/Container';
+import LandingPage from './Landing';
+import PasswordResetPage from './PasswordReset';
+import PasswordUpdatePage from './PasswordUpdate';
+import ProtectedRoute from './ProtectedRoute';
+import SignInPage from './SignIn';
+import SignUpPage from './SignUp';
 
-import * as ROUTES from "../constants/routes";
+const App = () => {
+  const { auth } = useContext(AuthContext);
 
-const App = () => (
-  <Router>
-    <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
-    <Route path={ROUTES.SIGN_IN} component={SignInPage} />
-    <Route path={ROUTES.PASSWORD_RESET} component={PasswordResetPage} />
-    <Route path={ROUTES.PASSWORD_UPDATE} component={PasswordUpdatePage} />
-  </Router>
-);
+  return (
+    <Router>
+      <Route path={AuthRoute.AUTH}>
+        <Container>
+          <ProtectedRoute
+            open={!auth.user}
+            redirect={AuthRoute.LANDING}
+            path={AuthRoute.SIGN_IN}
+            component={SignInPage}
+          />
 
-// <Route exact path={ROUTES.LANDING} component={LandingPage} />
-//
-// <Route path={ROUTES.HOME} component={HomePage} />
-// <Route path={ROUTES.ACCOUNT} component={AccountPage} />
-// <Route path={ROUTES.ADMIN} component={AdminPage} />
+          <ProtectedRoute
+            open={!auth.user}
+            redirect={AuthRoute.LANDING}
+            path={AuthRoute.SIGN_UP}
+            component={SignUpPage}
+          />
+
+          <Route
+            path={AuthRoute.PASSWORD_RESET}
+            component={PasswordResetPage}
+          />
+
+          <Route
+            path={AuthRoute.PASSWORD_UPDATE}
+            component={PasswordUpdatePage}
+          />
+        </Container>
+      </Route>
+
+      <ProtectedRoute
+        open={!!auth.user}
+        redirect={AuthRoute.SIGN_IN}
+        path={AuthRoute.LANDING}
+        component={LandingPage}
+      />
+    </Router>
+  );
+};
 
 export default App;

@@ -6,7 +6,7 @@ export type Rule<T> =
   | undefined;
 
 export interface Rules {
-  required?: Rule<boolean>;
+  required?: string;
   validate?: Rule<(value: string) => boolean>;
   pattern?: Rule<RegExp>;
   match?: Rule<string>;

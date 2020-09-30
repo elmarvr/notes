@@ -1,12 +1,25 @@
 interface SignUpElements extends HTMLFormControlsCollection {
-  email: HTMLInputElement;
-  passwordOne: HTMLInputElement;
-  passwordTwo: HTMLInputElement;
+  username: HTMLInputElement;
+  password: HTMLInputElement;
+  passwordRepeat: HTMLInputElement;
 }
 
 interface SignInElements extends HTMLFormControlsCollection {
-  email: HTMLInputElement;
+  username: HTMLInputElement;
   password: HTMLInputElement;
 }
 
-export { SignUpElements, SignInElements };
+interface PasswordResetElements extends HTMLFormControlsCollection {
+  email: HTMLInputElement;
+}
+
+interface PasswordUpdateElements extends HTMLFormControlsCollection {
+  password: HTMLInputElement;
+}
+
+export {
+  SignUpElements,
+  SignInElements,
+  PasswordResetElements,
+  PasswordUpdateElements,
+};

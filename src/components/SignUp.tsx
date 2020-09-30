@@ -1,85 +1,77 @@
-import React, { FormEvent } from "react";
-import { useHistory } from "react-router-dom";
+import { FirebaseError } from 'firebase';
+import React, { FormEvent, useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 
-import { useForm, useAuth } from "../hooks";
-
-import { Card, Form, Button } from "semantic-ui-react";
-import { Center, BackHeader, FormInput } from "./styled";
-
-import { SignUpElements } from "../models";
-
-import * as ROUTES from "../constants/routes";
+import AuthContext from '../context/AuthContext';
+import { useForm } from '../hooks';
+import { AuthError, AuthRoute, SignUpElements } from '../models';
+import { getFormElements } from '../utils/getFormElements';
+import { Field, Widget } from './func';
 
 const SignUp = () => {
+  const { auth, signUp } = useContext(AuthContext);
+  const { register, handleSubmit, errors, setError } = useForm();
   const history = useHistory();
-  const auth = useAuth();
-  const { register, handleSubmit, errors } = useForm();
 
-  const signUp = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const { username, password } = getFormElements<SignUpElements>(event);
 
-    const formEL = e.target as HTMLFormElement;
-    const { email, passwordOne } = formEL.elements as SignUpElements;
-
-    const user = await auth.signUp(email.value, passwordOne.value);
+    try {
+      await signUp(username.value, password.value);
+      history.push(AuthRoute.LANDING);
+    } catch (error) {
+      console.log(error);
+      setError("authorization", (error as FirebaseError).code);
+    }
   };
 
   return (
-    <Center>
-      <Card fluid>
-        <BackHeader to={ROUTES.SIGN_IN} title="Sign Up" />
-        <Card.Content>
-          <Form onSubmit={handleSubmit(signUp)}>
-            <FormInput
-              ref={register({
-                required: true,
-                pattern: /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/,
-                error: {
-                  required: "this is required",
-                  pattern: "invalid email address",
-                },
-              })}
-              name="email"
-              label="Email:"
-              type="text"
-              errors={errors}
-            />
-            <FormInput
-              ref={register({
-                required: true,
-                validate: (value) => value.length >= 6,
-                error: {
-                  required: "this is required",
-                  validate: "password needs to be at least 6 characters long",
-                },
-              })}
-              name="passwordOne"
-              label="Password:"
-              type="password"
-              errors={errors}
-            />
-            <FormInput
-              ref={register({
-                required: true,
-                match: "passwordOne",
-                error: {
-                  required: "this is required",
-                  match: "passwords don't match",
-                },
-              })}
-              name="passwordTwo"
-              label="Confirm Password:"
-              type="password"
-              errors={errors}
-            />
+    <Widget loading={auth.loading} onSubmit={onSubmit}>
+      <Field
+        ref={register({
+          required: "field is required",
+          pattern: {
+            value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+            message: "email address is invalid",
+          },
+        })}
+        name="username"
+        label="Email:"
+        icon="mail"
+      >
+        {errors.username}
+        {errors.authorization === AuthError.EMAIL_EXISTS &&
+          "email already exists"}
+      </Field>
 
-            <Button size="large" primary fluid type="submit">
-              Login
-            </Button>
-          </Form>
-        </Card.Content>
-      </Card>
-    </Center>
+      <Field
+        type="password"
+        ref={register({
+          required: "field is required",
+          validate: {
+            value: (value) => value.length > 0,
+            message: "password needs to be at least 6 characters long",
+          },
+        })}
+        name="password"
+        label="Password:"
+        icon="lock"
+        error={errors.password}
+      />
+
+      <Field
+        type="password"
+        ref={register({
+          required: "field is required",
+          match: { value: "password", message: "passwords don't match" },
+        })}
+        name="passwordRepeat"
+        label="Confirm Password:"
+        icon="copy"
+        error={errors.passwordRepeat}
+      />
+    </Widget>
   );
 };
 

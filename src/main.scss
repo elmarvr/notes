@@ -7,5 +7,10 @@
 
 body,
 #app {
+  background-color: #f7f7f7;
   height: 100vh;
+}
+
+.form-transition {
+  transition: all 0.1s 0.3s !important;
 }

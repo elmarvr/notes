@@ -1,14 +1,16 @@
 import React, { createContext } from "react";
-import useProvideAuth from "../hooks/useAuth";
+import { useAuth } from "../hooks";
 
-const AuthContext = createContext({});
+type Context = ReturnType<typeof useAuth>;
 
-const ProvideAuth: React.FC = ({ children }) => {
-  const auth = useProvideAuth();
+const AuthContext = createContext<Context>({} as Context);
+
+const AuthProvider: React.FC = ({ children }) => {
+  const auth = useAuth();
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;
 
-export { ProvideAuth };
+export { AuthProvider };

@@ -1,8 +1,8 @@
-import { useRef, useState, FormEvent } from "react";
-import { Rules, Field, FieldError } from "../models";
+import { FormEvent, useEffect, useRef, useState } from 'react';
 
-import { getFieldErrors, isUniqueFieldName } from "../logic";
-import { isEmpty } from "../utils/isEmpty";
+import { getFieldErrors, isUniqueFieldName } from '../logic';
+import { Field, FieldError, Rules } from '../models';
+import { isEmpty } from '../utils/isEmpty';
 
 type InputEl = HTMLInputElement | null;
 
@@ -34,24 +34,33 @@ const useForm = () => {
     return (ref: InputEl) => addField(ref, arg as Rules);
   };
 
-  const handleSubmit = (callback: SubmitCallback) => {
-    return (event: FormEvent<HTMLFormElement>) => {
-      const formErrors = getFieldErrors(fieldArrayRef.current);
+  const handleSubmit = (callback: SubmitCallback) => (
+    event: FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    const formErrors = getFieldErrors(fieldArrayRef.current);
 
-      setErrors(formErrors);
+    setErrors(formErrors);
 
-      const isValid = isEmpty(formErrors);
+    const isValid = isEmpty(formErrors);
 
-      if (isValid) {
-        callback(event);
-      }
-    };
+    if (isValid) {
+      callback(event);
+    }
+  };
+
+  const setError = (name: string, message: string) => {
+    setErrors((prev) => ({
+      ...prev,
+      [name]: message,
+    }));
   };
 
   return {
     register,
     handleSubmit,
     errors,
+    setError,
   };
 };
 

@@ -2,13 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "semantic-ui-css/semantic.min.css";
 
-import { ProvideAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 
 import App from "./components/App";
 
 ReactDOM.render(
-  <ProvideAuth>
+  <AuthProvider>
     <App />
-  </ProvideAuth>,
+  </AuthProvider>,
   document.getElementById("app")
 );

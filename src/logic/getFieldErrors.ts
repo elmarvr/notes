@@ -1,11 +1,8 @@
-import { Field, TypeError, FieldError } from "../models";
-
-import { isEmpty } from "../utils/isEmpty";
-
-import { getRequiredError } from "./getRequiredError";
-import { getValidateError } from "./getValidateError";
-import { getPatternError } from "./getPatternError";
-import { getMatchError } from "./getMatchError";
+import { Field, FieldError } from '../models';
+import { getMatchError } from './getMatchError';
+import { getPatternError } from './getPatternError';
+import { getRequiredError } from './getRequiredError';
+import { getValidateError } from './getValidateError';
 
 const getFieldError = (field: Field, fields: Field[]) => {
   const { ref, required, validate, pattern, match } = field;
@@ -17,18 +14,17 @@ const getFieldError = (field: Field, fields: Field[]) => {
   const patternError = getPatternError(pattern, inputValue);
   const matchError = getMatchError(match, fields, inputValue);
 
-  const typeErrors: TypeError = {
-    ...requiredError,
-    ...validateError,
-    ...patternError,
-    ...matchError,
-  };
+  const typeErrors = [
+    requiredError,
+    validateError,
+    patternError,
+    matchError,
+  ].filter(Boolean);
 
   return (
-    !isEmpty(typeErrors) &&
-    ({
-      [ref.name]: typeErrors,
-    } as FieldError)
+    typeErrors.length > 0 && {
+      [ref.name]: typeErrors[0],
+    }
   );
 };
 
