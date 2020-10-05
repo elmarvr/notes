@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-const useMountedEffect = (callback: () => void, dependancies?: any[]) => {
+const useMountedEffect = (callback: () => void, dependencies?: any[]) => {
   const isMountedRef = useRef(false);
 
   useEffect(() => {
@@ -9,7 +9,7 @@ const useMountedEffect = (callback: () => void, dependancies?: any[]) => {
     }
 
     isMountedRef.current = true;
-  }, dependancies);
+  }, dependencies);
 };
 
 export default useMountedEffect;

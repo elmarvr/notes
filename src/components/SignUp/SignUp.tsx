@@ -2,15 +2,15 @@ import { FirebaseError } from 'firebase';
 import React, { FormEvent, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import AuthContext from '../context/AuthContext';
-import { useForm } from '../hooks';
-import { AuthError, AuthRoute, SignUpElements } from '../models';
-import { getFormElements } from '../utils/getFormElements';
-import { Field, Widget } from './func';
+import AuthContext from '../../context/AuthContext';
+import { useForm } from '../../hooks';
+import { AuthError, AuthRoute, SignUpElements } from '../../models';
+import { getFormElements } from '../../utils/getFormElements';
+import { Field, WidgetForm } from '../func';
 
-const SignUp = () => {
-  const { auth, signUp } = useContext(AuthContext);
-  const { register, handleSubmit, errors, setError } = useForm();
+const SignUp: React.FC = () => {
+  const { signUp } = useContext(AuthContext);
+  const { register, handleSubmit, setError, errors } = useForm();
   const history = useHistory();
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -27,7 +27,7 @@ const SignUp = () => {
   };
 
   return (
-    <Widget loading={auth.loading} onSubmit={onSubmit}>
+    <WidgetForm onSubmit={handleSubmit(onSubmit)}>
       <Field
         ref={register({
           required: "field is required",
@@ -39,11 +39,12 @@ const SignUp = () => {
         name="username"
         label="Email:"
         icon="mail"
-      >
-        {errors.username}
-        {errors.authorization === AuthError.EMAIL_EXISTS &&
-          "email already exists"}
-      </Field>
+        errors={[
+          errors.username?.message,
+          errors.authorization?.type === AuthError.EMAIL_EXISTS &&
+            "account with email address already exists",
+        ]}
+      />
 
       <Field
         type="password"
@@ -57,7 +58,7 @@ const SignUp = () => {
         name="password"
         label="Password:"
         icon="lock"
-        error={errors.password}
+        errors={[errors.password?.message]}
       />
 
       <Field
@@ -69,9 +70,9 @@ const SignUp = () => {
         name="passwordRepeat"
         label="Confirm Password:"
         icon="copy"
-        error={errors.passwordRepeat}
+        errors={[errors.passwordRepeat?.message]}
       />
-    </Widget>
+    </WidgetForm>
   );
 };
 

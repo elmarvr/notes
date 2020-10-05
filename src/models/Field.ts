@@ -13,5 +13,5 @@ export interface Rules {
 }
 
 export interface Field extends Rules {
-  ref: HTMLInputElement;
+  input: HTMLInputElement;
 }

@@ -1,8 +1,7 @@
+import { motion } from 'framer-motion';
 import React, { FormEvent } from 'react';
-import { PoseGroup } from 'react-pose';
-import { Button, Divider, Form, Segment } from 'semantic-ui-react';
+import { Segment } from 'semantic-ui-react';
 
-import Navigation from './Navigation/Navigation';
 import Title from './Title/Title';
 
 interface WidgetProps {
@@ -11,35 +10,10 @@ interface WidgetProps {
   disabled?: boolean;
 }
 
-const Widget: React.FC<WidgetProps> = ({
-  children,
-  onSubmit,
-  loading,
-  disabled,
-}) => (
+const Widget: React.FC<WidgetProps> = ({ children }) => (
   <>
     <Title />
-    <Segment>
-      <Navigation />
-
-      <Divider hidden />
-
-      <Form error size="large" onSubmit={onSubmit}>
-        {children}
-
-        <Divider hidden />
-
-        <Button
-          disabled={disabled}
-          loading={loading}
-          color="blue"
-          size="large"
-          fluid
-        >
-          Submit
-        </Button>
-      </Form>
-    </Segment>
+    <Segment>{children}</Segment>
   </>
 );
 

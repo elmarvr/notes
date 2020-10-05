@@ -1,14 +1,15 @@
 import { AuthError } from './AuthError';
 import { AuthRoute } from './AuthRoute';
 import { Field, Rule, Rules } from './Field';
-import { FieldError } from './FieldError';
 import {
     PasswordResetElements, PasswordUpdateElements, SignInElements, SignUpElements
 } from './FormElements';
+import { FormError, FormErrors } from './FormErrors';
+import { FormValues } from './FormValues';
 
 export {
   Rule,
-  FieldError,
+  FormError,
   Rules,
   Field,
   SignUpElements,
@@ -17,4 +18,6 @@ export {
   AuthError,
   PasswordResetElements,
   PasswordUpdateElements,
+  FormErrors,
+  FormValues,
 };

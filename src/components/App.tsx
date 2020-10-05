@@ -1,41 +1,45 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import AuthContext from '../context/AuthContext';
 import { AuthRoute } from '../models/AuthRoute';
-import Container from './func/Container/Container';
+import { AnimateSwitch, Container, LinkMessage, Navigation, Widget } from './func';
 import LandingPage from './Landing';
 import PasswordResetPage from './PasswordReset';
 import PasswordUpdatePage from './PasswordUpdate';
 import ProtectedRoute from './ProtectedRoute';
-import SignInPage from './SignIn';
-import SignUpPage from './SignUp';
+import SignInPage from './SignIn/SignIn';
+import SignUpPage from './SignUp/SignUp';
 
 const App = () => {
-  const { auth } = useContext(AuthContext);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   return (
     <Router>
       <Route path={AuthRoute.AUTH}>
         <Container>
-          <ProtectedRoute
-            open={!auth.user}
-            redirect={AuthRoute.LANDING}
-            path={AuthRoute.SIGN_IN}
-            component={SignInPage}
-          />
-
-          <ProtectedRoute
-            open={!auth.user}
-            redirect={AuthRoute.LANDING}
-            path={AuthRoute.SIGN_UP}
-            component={SignUpPage}
-          />
-
-          <Route
-            path={AuthRoute.PASSWORD_RESET}
-            component={PasswordResetPage}
-          />
+          <Widget>
+            <Navigation />
+            <AnimateSwitch>
+              <Route path={AuthRoute.SIGN_IN} component={SignInPage} />
+              <Route path={AuthRoute.SIGN_UP} component={SignUpPage} />
+              {/* <Route
+                path={AuthRoute.PASSWORD_RESET}
+                component={PasswordResetPage}
+              /> */}
+            </AnimateSwitch>
+          </Widget>
+          {/* <AnimateSwitch>
+            <Route
+              path={AuthRoute.SIGN_IN}
+              render={() => (
+                <LinkMessage to={AuthRoute.PASSWORD_RESET}>
+                  Password Reset?
+                </LinkMessage>
+              )}
+            />
+          </AnimateSwitch> */}
 
           <Route
             path={AuthRoute.PASSWORD_UPDATE}
@@ -44,12 +48,12 @@ const App = () => {
         </Container>
       </Route>
 
-      <ProtectedRoute
+      {/* <ProtectedRoute
         open={!!auth.user}
         redirect={AuthRoute.SIGN_IN}
         path={AuthRoute.LANDING}
         component={LandingPage}
-      />
+      /> */}
     </Router>
   );
 };

@@ -1,8 +1,9 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 
-import { getFieldErrors, isUniqueFieldName } from '../logic';
-import { Field, FieldError, Rules } from '../models';
+import { getFormErrors, getFormValues, isUniqueFieldName } from '../logic';
+import { Field, FormError, FormErrors, FormValues, Rules } from '../models';
 import { isEmpty } from '../utils/isEmpty';
+import { isEqual } from '../utils/isEqual';
 
 type InputEl = HTMLInputElement | null;
 
@@ -14,13 +15,26 @@ type Register = {
 };
 
 const useForm = () => {
-  const fieldArrayRef = useRef<Field[]>([]);
-  const [errors, setErrors] = useState<FieldError>({});
+  const fieldsRef = useRef<Field[]>([]);
+  const formValuesRef = useRef<string[]>([]);
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const addField = (ref: InputEl, rules?: Rules) => {
-    if (ref && isUniqueFieldName(fieldArrayRef.current, ref.name)) {
-      fieldArrayRef.current.push({
-        ref,
+  const setError = (name: string, type: string, message?: string) => {
+    const error = {
+      type,
+      message,
+    };
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+  };
+
+  const addField = (node: InputEl, rules?: Rules) => {
+    if (node && isUniqueFieldName(fieldsRef.current, node.name)) {
+      fieldsRef.current.push({
+        input: node,
         ...rules,
       });
     }
@@ -38,22 +52,18 @@ const useForm = () => {
     event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    const formErrors = getFieldErrors(fieldArrayRef.current);
+    const fields = fieldsRef.current;
+    const formValues = getFormValues(fields, event);
+    const formErrors = getFormErrors(fields);
 
-    setErrors(formErrors);
-
-    const isValid = isEmpty(formErrors);
-
-    if (isValid) {
-      callback(event);
+    if (!isEqual(formValuesRef.current, formValues)) {
+      setErrors(formErrors);
+      const isValid = isEmpty(formErrors);
+      if (isValid) {
+        callback(event);
+      }
+      formValuesRef.current = formValues;
     }
-  };
-
-  const setError = (name: string, message: string) => {
-    setErrors((prev) => ({
-      ...prev,
-      [name]: message,
-    }));
   };
 
   return {

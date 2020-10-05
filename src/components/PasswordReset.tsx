@@ -6,7 +6,7 @@ import AuthContext from '../context/AuthContext';
 import { useForm } from '../hooks';
 import { AuthError, PasswordResetElements } from '../models';
 import { getFormElements } from '../utils/getFormElements';
-import { Field, Widget } from './func';
+import { Field, WidgetForm } from './func';
 
 const PasswordReset = () => {
   const [isSubmit, setIsSubmit] = useState(false);
@@ -24,43 +24,26 @@ const PasswordReset = () => {
     }
   };
 
-  const tooManyRequests = errors.authorization === AuthError.TOO_MANY_REQUESTS;
-
   return (
-    <>
-      <Widget
-        disabled={tooManyRequests || isSubmit}
-        loading={auth.loading}
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <Field
-          label="Email:"
-          name="email"
-          icon="mail"
-          ref={register({
-            required: "field is required",
-            pattern: {
-              value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-              message: "email address is invalid",
-            },
-          })}
-        >
-          {errors.email}
-          {errors.authorization === AuthError.USER_NOT_FOUND &&
-            "user not found"}
-        </Field>
-      </Widget>
-
-      {isSubmit && (
-        <Message info>
-          email is send, you will recieve a reset link shortly
-        </Message>
-      )}
-
-      {tooManyRequests && (
-        <Message error>too many emails send, try again later...</Message>
-      )}
-    </>
+    <WidgetForm onSubmit={handleSubmit(onSubmit)}>
+      <Field
+        label="Email:"
+        name="email"
+        icon="mail"
+        ref={register({
+          required: "field is required",
+          pattern: {
+            value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+            message: "email address is invalid",
+          },
+        })}
+        errors={[
+          errors.email?.message,
+          errors.authorization?.type === AuthError.USER_NOT_FOUND &&
+            "user not found",
+        ]}
+      />
+    </WidgetForm>
   );
 };
 

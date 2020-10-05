@@ -1,6 +1,6 @@
 import 'firebase/auth';
 
-import app, { FirebaseError, User } from 'firebase/app';
+import app, { User } from 'firebase/app';
 import { useEffect, useState } from 'react';
 
 const config = {

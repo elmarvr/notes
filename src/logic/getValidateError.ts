@@ -1,8 +1,13 @@
-import { Rule, TypeError } from "../models";
+import { FormError, Rule } from '../models';
 
 const getValidateError = (
   validate: Rule<(value: string) => boolean>,
   value: string
-) => !!validate && !validate.value(value) && validate.message;
+): FormError | false =>
+  !!validate &&
+  !validate.value(value) && {
+    type: "validate",
+    message: validate.message,
+  };
 
 export { getValidateError };

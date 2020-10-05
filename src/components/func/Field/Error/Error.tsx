@@ -1,13 +1,21 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
+import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
 
 interface ErrorProps {
+  uniqKey: string;
   message?: string | boolean;
   onComplete: () => void;
 }
 
-const container = {
-  enter: {
+const expandConfig = {
+  initial: {
+    height: 0,
+    transition: {
+      duration: 0.3,
+      when: "afterChildren",
+    },
+  },
+  expand: {
     height: "auto",
     transition: {
       delay: 0.2,
@@ -15,24 +23,17 @@ const container = {
       when: "beforeChildren",
     },
   },
-  exit: {
-    height: 0,
-    transition: {
-      duration: 0.3,
-      when: "afterChildren",
-    },
-  },
 };
 
-const label = {
-  enter: {
-    opacity: 1,
+const labelConfig = {
+  initial: {
+    opacity: 0,
     transition: {
       duration: 0.3,
     },
   },
-  exit: {
-    opacity: 0,
+  expand: {
+    opacity: 1,
     transition: {
       duration: 0.3,
     },
@@ -40,22 +41,32 @@ const label = {
 };
 
 const Error: React.FC<ErrorProps> = ({ message, onComplete }) => {
+  const [label, setLabel] = useState(message);
+
+  useEffect(() => {
+    if (message) {
+      setLabel(message);
+    }
+  }, [message]);
+
   return (
-    <AnimatePresence>
-      {message && (
+    <>
+      <motion.div
+        initial="initial"
+        animate={message ? "expand" : "initial"}
+        exit={message ? "initial" : ""}
+        variants={expandConfig}
+        onAnimationComplete={onComplete}
+      >
         <motion.div
-          initial="exit"
-          animate="enter"
-          exit="exit"
-          variants={container}
-          onAnimationComplete={onComplete}
+          layout
+          variants={labelConfig}
+          className="ui label prompt pointing"
         >
-          <motion.div variants={label} className="ui label prompt pointing">
-            {message}
-          </motion.div>
+          {label}
         </motion.div>
-      )}
-    </AnimatePresence>
+      </motion.div>
+    </>
   );
 };
 
